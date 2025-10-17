@@ -1,0 +1,122 @@
+body {
+    background: linear-gradient(180deg, #b9fbc0 0%, #a3e4db 100%);
+    font-family: 'Comic Sans MS', 'Poppins', sans-serif;
+    color: #2e7d32;
+}
+
+/* Encabezado */
+h2 {
+    text-align: center;
+    font-weight: 700;
+    color: #388e3c;
+    margin-bottom: 2rem;
+    text-shadow: 2px 2px #c8e6c9;
+}
+
+/* Filtros */
+form.mb-3 {
+    background: #ffffffb5;
+    border-radius: 20px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+select.form-select,
+input.form-control {
+    border-radius: 15px;
+    border: 2px solid #81c784;
+}
+
+button.btn-primary {
+    background-color: #66bb6a;
+    border: none;
+    border-radius: 15px;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+button.btn-primary:hover {
+    background-color: #43a047;
+    transform: scale(1.05);
+}
+
+/* Tabla */
+table.table {
+    background-color: #fff;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+table th {
+    background-color: #a5d6a7;
+    color: #1b5e20;
+    text-align: center;
+}
+
+table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+table img {
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Botones de acción */
+.btn-sm {
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.btn-success {
+    background-color: #81c784;
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: #66bb6a;
+}
+
+.btn-danger {
+    background-color: #ef9a9a;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #e57373;
+}
+
+.btn-primary {
+    background-color: #4fc3f7;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #29b6f6;
+}
+
+/* Paginación */
+.d-flex.justify-content-between {
+    background-color: #ffffffb5;
+    padding: 1rem;
+    border-radius: 20px;
+    margin-top: 2rem;
+}
+
+.btn-secondary {
+    background-color: #aed581;
+    border: none;
+}
+
+.btn-secondary:hover {
+    background-color: #9ccc65;
+}
+
+/* Efectos hover en filas */
+tbody tr:hover {
+    background-color: #e8f5e9;
+    transition: background-color 0.3s ease;
+}

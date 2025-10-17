@@ -1,0 +1,42 @@
+﻿@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Iniciar sesión";
+}
+
+<!-- 🔹 Vinculamos el CSS externo -->
+<link rel="stylesheet" href="~/css/login.css" />
+
+<div class="login-container">
+    <h2>🌴 Bienvenido de nuevo</h2>
+    <p class="text-muted mb-4">Inicia sesión para acceder a tu colección de ACNH 🐚</p>
+
+    <form id="account" method="post">
+        <div class="form-floating">
+            <input asp-for="Input.Email" class="form-control" placeholder="Correo electrónico" />
+            <label asp-for="Input.Email">Correo electrónico</label>
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-floating">
+            <input asp-for="Input.Password" class="form-control" placeholder="Contraseña" />
+            <label asp-for="Input.Password">Contraseña</label>
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
+
+        <div class="form-check mb-3 text-start">
+            <input asp-for="Input.RememberMe" class="form-check-input" />
+            <label asp-for="Input.RememberMe" class="form-check-label">Recordarme</label>
+        </div>
+
+        <button type="submit" class="btn-login">Iniciar sesión</button>
+
+        <div class="extra-links mt-3">
+            <a asp-page="./Register">¿No tienes cuenta? Regístrate aquí</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

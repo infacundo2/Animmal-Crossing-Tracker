@@ -1,0 +1,62 @@
+body {
+    background: linear-gradient(180deg, #e8f5e9 0%, #ffffff 100%);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.hero-section {
+    text-align: center;
+    padding: 6rem 1rem;
+    color: #2e7d32;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #1b5e20;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: #4e734e;
+}
+
+.btn-main {
+    background-color: #66bb6a;
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-main:hover {
+    background-color: #43a047;
+    transform: translateY(-2px);
+    color: white;
+}
+
+.btn-outline-success {
+    border: 2px solid #66bb6a;
+    color: #2e7d32;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-success:hover {
+    background-color: #66bb6a;
+    color: white;
+}
+
+footer {
+    text-align: center;
+    padding: 2rem 0;
+    color: #666;
+    font-size: 0.9rem;
+}

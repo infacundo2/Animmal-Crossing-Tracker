@@ -1,0 +1,130 @@
+@model IEnumerable<AnimalCrossingTracker.Models.ViewModels.CollectibleViewModel>
+@{
+    ViewData["Title"] = "Coleccionables";
+}
+
+<!-- 🔹 Vincular CSS externo -->
+<link rel="stylesheet" href="~/css/collectibles.css" />
+
+<h2>🌿 Coleccionables de Animal Crossing</h2>
+
+<form asp-action="Index" method="get" class="mb-3 d-flex align-items-center gap-2 flex-wrap justify-content-center">
+    <label for="category" class="form-label mb-0">Categoría:</label>
+    <select id="category" name="category" class="form-select w-auto" onchange="this.form.submit()">
+        <option value="">Todas</option>
+        <option value="fish" selected="@(ViewBag.SelectedCategory == "fish")">Peces</option>
+        <option value="bugs" selected="@(ViewBag.SelectedCategory == "bugs")">Bichos</option>
+        <option value="sea" selected="@(ViewBag.SelectedCategory == "sea")">Criaturas marinas</option>
+        <option value="art" selected="@(ViewBag.SelectedCategory == "art")">Arte</option>
+        <option value="furniture" selected="@(ViewBag.SelectedCategory == "furniture")">Muebles</option>
+        <option value="clothing" selected="@(ViewBag.SelectedCategory == "clothing")">Ropa</option>
+        <option value="interior" selected="@(ViewBag.SelectedCategory == "interior")">Decoración interior</option>
+        <option value="tools" selected="@(ViewBag.SelectedCategory == "tools")">Herramientas</option>
+        <option value="items" selected="@(ViewBag.SelectedCategory == "items")">Objetos</option>
+        <option value="recipes" selected="@(ViewBag.SelectedCategory == "recipes")">Recetas</option>
+        <option value="villagers" selected="@(ViewBag.SelectedCategory == "villagers")">Aldeanos</option>
+        <option value="gyroids" selected="@(ViewBag.SelectedCategory == "gyroids")">Giroide</option>
+        <option value="fossils_individuals" selected="@(ViewBag.SelectedCategory == "fossils_individuals")">Fósiles individuales</option>
+    </select>
+
+    <label for="month" class="form-label mb-0">Mes:</label>
+    <select id="month" name="month" class="form-select w-auto" onchange="this.form.submit()">
+        <option value="">Todos</option>
+        @for (int m = 1; m <= 12; m++)
+        {
+            <option value="@m" selected="@(ViewBag.SelectedMonth == m)">
+                @{
+                    var monthName = System.Globalization.CultureInfo.GetCultureInfo("es-ES")
+                        .DateTimeFormat.GetMonthName(m);
+                    monthName = char.ToUpper(monthName[0]) + monthName.Substring(1);
+                }
+                @monthName
+            </option>
+        }
+    </select>
+
+    <input type="text" name="search" value="@ViewBag.SearchQuery" class="form-control w-auto" placeholder="🔍 Buscar..." />
+    <button type="submit" class="btn btn-primary">Buscar</button>
+</form>
+
+@functions {
+    public static string Capitalize(string text)
+        => string.IsNullOrEmpty(text) ? text : char.ToUpper(text[0]) + text[1..];
+}
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Imagen</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Tengo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr style="background-color:@(item.HasItem ? "#d4edda" : "#f8d7da")">
+                <td>
+                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                    {
+                        <img src="@item.ImageUrl" alt="@item.Name" width="50" />
+                    }
+                </td>
+                <td>@item.Name</td>
+                <td>@item.Category</td>
+                <td>
+                    @if (item.HasItem)
+                    {
+                        <span class="text-success">✔</span>
+                    }
+                    else
+                    {
+                        <span class="text-danger">✖</span>
+                    }
+                </td>
+                <td>
+                    <form asp-action="Toggle" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <input type="hidden" name="category" value="@(ViewBag.SelectedCategory ?? "")" />
+                        <input type="hidden" name="search" value="@(ViewBag.SearchQuery ?? "")" />
+                        <input type="hidden" name="month" value="@(ViewBag.SelectedMonth ?? "")" />
+                        <input type="hidden" name="page" value="@(ViewBag.Page ?? 1)" />
+
+                        <button type="submit" class="btn btn-sm @(item.HasItem ? "btn-danger" : "btn-success")">
+                            @(item.HasItem ? "Quitar" : "Tengo")
+                        </button>
+                        <a asp-action="Details" asp-route-id="@item.Id"
+                           asp-route-category="@(ViewBag.SelectedCategory)"
+                           class="btn btn-sm btn-primary">Ver</a>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <div>Página @ViewBag.Page de @ViewBag.TotalPages</div>
+    <div>
+        @if (ViewBag.Page > 1)
+        {
+            <a asp-action="Index"
+               asp-route-category="@(ViewBag.SelectedCategory)"
+               asp-route-search="@(ViewBag.SearchQuery)"
+               asp-route-month="@(ViewBag.SelectedMonth)"
+               asp-route-page="@(ViewBag.Page - 1)"
+               class="btn btn-secondary btn-sm">← Anterior</a>
+        }
+        @if (ViewBag.Page < ViewBag.TotalPages)
+        {
+            <a asp-action="Index"
+               asp-route-category="@(ViewBag.SelectedCategory)"
+               asp-route-search="@(ViewBag.SearchQuery)"
+               asp-route-month="@(ViewBag.SelectedMonth)"
+               asp-route-page="@(ViewBag.Page + 1)"
+               class="btn btn-secondary btn-sm">Siguiente →</a>
+        }
+    </div>
+</div>
+

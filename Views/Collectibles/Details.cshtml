@@ -1,0 +1,577 @@
+@model AnimalCrossingTracker.Models.Collectible
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = Model.Name;
+
+    JsonElement? json = null;
+
+    if (!string.IsNullOrWhiteSpace(Model.JsonData))
+    {
+        try
+        {
+            json = JsonSerializer.Deserialize<JsonElement>(Model.JsonData);
+        }
+        catch
+        {
+            json = null;
+        }
+    }
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3">@Model.Name</h2>
+
+    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <img src="@Model.ImageUrl" alt="@Model.Name" class="img-thumbnail mb-3" width="160" />
+    }
+
+    <p><strong>Categoría:</strong> @Model.Category</p>
+    <p><strong>Descripción:</strong> @Model.Description</p>
+
+    <hr />
+
+    @if (json.HasValue)
+    {
+        var j = JsonDocument.Parse(Model.JsonData).RootElement;
+        if (j.ValueKind == JsonValueKind.Array && j.GetArrayLength() > 0)
+            j = j[0];
+
+        // ✅ Helper seguro para valores numéricos
+        int SafeGetInt(JsonElement element)
+        {
+            try
+            {
+                return element.ValueKind switch
+                {
+                    JsonValueKind.Number => element.GetInt32(),
+                    JsonValueKind.String => int.TryParse(element.GetString(), out int v) ? v : 0,
+                    _ => 0
+                };
+            }
+            catch { return 0; }
+        }
+
+        // ✅ Helper seguro para obtener horarios
+        string GetTimes(JsonElement hemi)
+        {
+            try
+            {
+                // availability_array
+                if (hemi.TryGetProperty("availability_array", out var availArray) && availArray.ValueKind == JsonValueKind.Array)
+                {
+                    var results = new List<string>();
+                    foreach (var a in availArray.EnumerateArray())
+                    {
+                        string months = a.TryGetProperty("months", out var m) ? m.GetString() ?? "" : "";
+                        string time = a.TryGetProperty("time", out var t) ? t.GetString() ?? "" : "";
+
+                        if (!string.IsNullOrWhiteSpace(months))
+                            results.Add($"{months}: {(string.IsNullOrWhiteSpace(time) || time == "NA" ? "Todo el día" : time)}");
+                    }
+                    if (results.Count > 0)
+                        return string.Join(" | ", results);
+                }
+
+                // times_by_month
+                if (hemi.TryGetProperty("times_by_month", out var tbm) && tbm.ValueKind == JsonValueKind.Object)
+                {
+                    var times = new HashSet<string>();
+                    foreach (var prop in tbm.EnumerateObject())
+                    {
+                        var val = prop.Value.GetString();
+                        if (!string.IsNullOrWhiteSpace(val) && val != "NA")
+                            times.Add(val);
+                    }
+                    if (times.Count > 0)
+                        return string.Join(" | ", times);
+                }
+
+                return "Todo el día";
+            }
+            catch
+            {
+                return "Todo el día";
+            }
+        }
+
+        <div class="bg-light p-3 rounded shadow-sm">
+            @switch (Model.Category)
+            {
+                // 🐟 FISH & SEA CREATURES
+                case "fish":
+                {
+                    <h4>📍 Información general</h4>
+                    <p><strong>Ubicación:</strong> @(j.TryGetProperty("location", out var loc) ? loc.GetString() : "-")</p>
+                    <p><strong>Tamaño de sombra:</strong> @(j.TryGetProperty("shadow_size", out var shadow) ? shadow.GetString() : "-")</p>
+                    <p><strong>Rareza:</strong> @(j.TryGetProperty("rarity", out var rare) ? rare.GetString() : "-")</p>
+
+                    <h4>💰 Valores</h4>
+                    <p><strong>Nook's Cranny:</strong> @(int.TryParse(j.GetProperty("sell_nook").GetString(), out var sell) ? sell : 0) Bells</p>
+                    <p><strong>C.J.:</strong> @(int.TryParse(j.GetProperty("sell_cj").GetString(), out var sellCj) ? sellCj : (int?)(sell * 1.5)) Bells</p>
+
+                        <h4>🕐 Disponibilidad</h4>
+
+                        {
+                            string MostrarDisponibilidad(JsonElement j, string prefijo)
+                            {
+                                try
+                                {
+                                    string meses = "-";
+                                    string horario = "Todo el día";
+
+                                    // 1️⃣ Intentar con n_availability o s_availability
+                                    if (j.TryGetProperty($"{prefijo}_availability", out var avProp) && avProp.ValueKind == JsonValueKind.String)
+                                        meses = avProp.GetString() ?? "-";
+
+                                    // 2️⃣ Intentar con availability_north/south array
+                                    if (j.TryGetProperty($"availability_{(prefijo == "n" ? "north" : "south")}", out var arr) &&
+                                        arr.ValueKind == JsonValueKind.Array &&
+                                        arr.GetArrayLength() > 0)
+                                    {
+                                        var obj = arr[0];
+                                        if (obj.TryGetProperty("months", out var m)) meses = m.GetString() ?? meses;
+                                        if (obj.TryGetProperty("time", out var t) && !string.IsNullOrWhiteSpace(t.GetString()))
+                                            horario = t.GetString()!;
+                                    }
+
+                                    // 3️⃣ Intentar con times_by_month_north/south
+                                    if (horario == "Todo el día" &&
+                                        j.TryGetProperty($"times_by_month_{(prefijo == "n" ? "north" : "south")}", out var tbm) &&
+                                        tbm.ValueKind == JsonValueKind.Object)
+                                    {
+                                        var valores = new HashSet<string>();
+                                        foreach (var prop in tbm.EnumerateObject())
+                                        {
+                                            var val = prop.Value.GetString();
+                                            if (!string.IsNullOrWhiteSpace(val) && val != "NA")
+                                                valores.Add(val);
+                                        }
+                                        if (valores.Count > 0)
+                                            horario = string.Join(" | ", valores);
+                                    }
+
+                                    return $"<p><strong>Hemisferio {(prefijo == "n" ? "Norte" : "Sur")}:</strong> {meses}</p><p><strong>Horario:</strong> {horario}</p>";
+                                }
+                                catch
+                                {
+                                    return $"<p><strong>Hemisferio {(prefijo == "n" ? "Norte" : "Sur")}:</strong> -</p><p><strong>Horario:</strong> Error</p>";
+                                }
+                            }
+
+                            //@Html.Raw(MostrarDisponibilidad(j, "n"))
+                            @Html.Raw(MostrarDisponibilidad(j, "s"))
+                        }
+
+
+                    <h4>🎣 Frase al atraparlo</h4>
+                    <p>@(j.TryGetProperty("catchphrase", out var catchp) ? catchp.GetString() : "-")</p>
+
+                    <h4>🦈 Otros</h4>
+                    <p><strong>Versión añadida:</strong> @(j.TryGetProperty("version_added", out var verFish) ? verFish.GetString() : "-")</p>
+                }
+                break;
+
+                // SEA CREATURES
+                case "sea":
+                {
+                    // 🐚 Disponibilidad
+                    JsonElement north = default;
+                    JsonElement south = default;
+
+                    bool hasAvailabilityNorth =
+                        j.TryGetProperty("availability_north", out north) && north.ValueKind == JsonValueKind.Array;
+                    bool hasAvailabilitySouth =
+                        j.TryGetProperty("availability_south", out south) && south.ValueKind == JsonValueKind.Array;
+
+                    <h4>📍 Información general</h4>
+                    <p><strong>Tamaño de sombra:</strong> @(j.TryGetProperty("shadow_size", out var shadow) ? shadow.GetString() : "-")</p>
+                    <p><strong>Movimiento de sombra:</strong> @(j.TryGetProperty("shadow_movement", out var move) ? move.GetString() : "-")</p>
+                    <p><strong>Rareza:</strong> @(j.TryGetProperty("rarity", out var rare) ? rare.GetString() : "-")</p>
+
+                    <h4>💰 Valores</h4>
+                    <p><strong>Nook's Cranny:</strong> @(j.TryGetProperty("sell_nook", out var sell)
+                        ? (int.TryParse(sell.GetString(), out var val) ? val : 0)
+                        : 0) Bells</p>
+
+                    <h4>🕐 Disponibilidad</h4>
+                    //@if (hasAvailabilityNorth)
+                    //{
+                    //    var availN = north[0];
+                    //   <p><strong>Hemisferio Norte:</strong> @(availN.TryGetProperty("months", out var monthsN) ? monthsN.GetString() : "-")</p>
+                    //    <p><strong>Horario:</strong> @(availN.TryGetProperty("time", out var timeN) ? timeN.GetString() : "Todo el día")</p>
+                    //}
+
+                    @if (hasAvailabilitySouth)
+                    {
+                        var availS = south[0];
+                        <p><strong>Hemisferio Sur:</strong> @(availS.TryGetProperty("months", out var monthsS) ? monthsS.GetString() : "-")</p>
+                        <p><strong>Horario:</strong> @(availS.TryGetProperty("time", out var timeS) ? timeS.GetString() : "Todo el día")</p>
+                    }
+
+                    <h4>🦑 Otros</h4>
+                    <p><strong>Capturas totales:</strong> @(j.TryGetProperty("total_catch", out var total) ? total.GetString() : "-")</p>
+                    <p><strong>Frase de captura:</strong> @(j.TryGetProperty("catchphrase", out var cf) ? cf.GetString() : "-")</p>
+                }
+                break;
+
+
+                // 🐛 BUGS
+                case "bugs":
+                {
+                    // 🐜 Datos de disponibilidad
+                    JsonElement north = default;
+                    JsonElement south = default;
+
+                    bool hasAvailabilityNorth =
+                        j.TryGetProperty("availability_north", out north) && north.ValueKind == JsonValueKind.Array;
+                    bool hasAvailabilitySouth =
+                        j.TryGetProperty("availability_south", out south) && south.ValueKind == JsonValueKind.Array;
+
+                    <h4>📍 Información general</h4>
+                    <p><strong>Ubicación:</strong> @(j.TryGetProperty("location", out var loc) ? loc.GetString() : "-")</p>
+                    <p><strong>Clima:</strong> @(j.TryGetProperty("weather", out var weather) ? weather.GetString() : "-")</p>
+                    <p><strong>Rareza:</strong> @(j.TryGetProperty("rarity", out var rare) ? rare.GetString() : "-")</p>
+
+                    <h4>💰 Valores</h4>
+                    <p><strong>Nook's Cranny:</strong> @(j.TryGetProperty("sell_nook", out var sell)
+                        ? (int.TryParse(sell.GetString(), out var val) ? val : 0) : 0) Bells</p>
+
+                    <p><strong>Flick:</strong> @(j.TryGetProperty("sell_flick", out var sellFlick)
+                        ? (int.TryParse(sellFlick.GetString(), out var val2) ? val2 : 0)
+                        : (j.TryGetProperty("sell_nook", out var fallbackSell)
+                            && int.TryParse(fallbackSell.GetString(), out var val3)
+                                ? (int)(val3 * 1.5)
+                                : 0)) Bells</p>
+
+                    <h4>🕐 Disponibilidad</h4>
+                    @if (hasAvailabilityNorth)
+                    {
+                       // var availN = north[0];
+                       // <p><strong>Hemisferio Norte:</strong> @(availN.TryGetProperty("months", out var monthsN) ? monthsN.GetString() : "-")</p>
+                        //<p><strong>Horario:</strong> @(availN.TryGetProperty("time", out var timeN) ? timeN.GetString() : "Todo el día")</p>
+                    }
+
+                    @if (hasAvailabilitySouth)
+                    {
+                        var availS = south[0];
+                        <p><strong>Hemisferio Sur:</strong> @(availS.TryGetProperty("months", out var monthsS) ? monthsS.GetString() : "-")</p>
+                        <p><strong>Horario:</strong> @(availS.TryGetProperty("time", out var timeS) ? timeS.GetString() : "Todo el día")</p>
+                    }
+
+                    <h4>🪲 Otros</h4>
+                    <p><strong>Capturas totales:</strong> @(j.TryGetProperty("total_catch", out var total) ? total.GetString() : "-")</p>
+                    <p><strong>Frase de captura:</strong> @(j.TryGetProperty("catchphrase", out var cf) ? cf.GetString() : "-")</p>
+                }
+                break;
+
+
+                // 🎨 ART
+                case "art":
+                {
+                    <h4>🖼️ Obra de arte</h4>
+                    <p><strong>Nombre original:</strong> @(j.TryGetProperty("art_name", out var artName) ? artName.GetString() : "-")</p>
+                    <p><strong>Tipo:</strong> @(j.TryGetProperty("art_type", out var type) ? type.GetString() : "-")</p>
+                    <p><strong>Autor:</strong> @(j.TryGetProperty("author", out var author) ? author.GetString() : "-")</p>
+                    <p><strong>Año:</strong> @(j.TryGetProperty("year", out var year) ? year.GetString() : "-")</p>
+                    <p><strong>Estilo:</strong> @(j.TryGetProperty("art_style", out var style) ? style.GetString() : "-")</p>
+
+                    <h4>🧾 Descripción</h4>
+                    <p>@(j.TryGetProperty("description", out var desc) ? desc.GetString() : "-")</p>
+
+                    <h4>💰 Valores</h4>
+                    <p><strong>Compra:</strong> @(j.TryGetProperty("buy", out var buy) ? buy.GetRawText() : "N/A") Bells</p>
+                    <p><strong>Venta:</strong> @(j.TryGetProperty("sell", out var sell) ? sell.GetRawText() : "N/A") Bells</p>
+                    <p><strong>Disponibilidad:</strong> @(j.TryGetProperty("availability", out var avail) ? avail.GetString() : "-")</p>
+
+                    <h4>🧠 Autenticidad</h4>
+                    <p><strong>Tiene falsificación:</strong> @(j.TryGetProperty("has_fake", out var fake) ? (fake.GetBoolean() ? "Sí" : "No") : "Desconocido")</p>
+                    <p><strong>Detalles de autenticidad:</strong> @(j.TryGetProperty("authenticity", out var auth) ? auth.GetString() : "-")</p>
+
+                    <h4>🖼️ Imágenes</h4>
+                    <div class="d-flex gap-3">
+                        @if (j.TryGetProperty("image_url", out var realImg))
+                        {
+                            <div>
+                                <p><strong>Original:</strong></p>
+                                <img src="@realImg.GetString()" alt="Original" class="img-thumbnail" width="160" />
+                            </div>
+                        }
+
+                        @if (j.TryGetProperty("fake_image_url", out var fakeImg))
+                        {
+                            <div>
+                                <p><strong>Falsificación:</strong></p>
+                                <img src="@fakeImg.GetString()" alt="Fake" class="img-thumbnail" width="160" />
+                            </div>
+                        }
+                    </div>
+                }
+                break;
+
+                // 🎒 ITEMS
+                case "items":
+                {
+                    <h4>📦 Información del ítem</h4>
+                    <p><strong>Nombre:</strong> @(j.TryGetProperty("name", out var name) ? name.GetString() : "-")</p>
+                    <p><strong>Tipo de material:</strong> @(j.TryGetProperty("material_type", out var mType) ? mType.GetString() : "-")</p>
+                    <p><strong>Estacionalidad:</strong> @(j.TryGetProperty("material_seasonality", out var season) ? season.GetString() : "-")</p>
+                    <p><strong>Versión añadida:</strong> @(j.TryGetProperty("version_added", out var ver) ? ver.GetString() : "-")</p>
+
+                    <h4>💰 Economía</h4>
+                    <p><strong>Precio de venta:</strong> @(j.TryGetProperty("sell", out var sell) ? SafeGetInt(sell) : 0) Bells</p>
+                    <p><strong>Precio de compra:</strong> 
+                        @{
+                            if (j.TryGetProperty("buy", out var buy) && buy.ValueKind == JsonValueKind.Array && buy.GetArrayLength() > 0)
+                            {
+                                <text>@string.Join(", ", buy.EnumerateArray().Select(x => x.GetString()))</text>;
+                            }
+                            else
+                            {
+                                <text>No disponible</text>;
+                            }
+                        }
+                    </p>
+
+                    <h4>📦 Almacenamiento</h4>
+                    <p><strong>Apilable hasta:</strong> @(j.TryGetProperty("stack", out var stackItem) ? SafeGetInt(stackItem) : 1)</p>
+                    <p><strong>Espacio ocupado:</strong> @(j.TryGetProperty("storage_size", out var storage) ? SafeGetInt(storage) : 1)</p>
+                    <p><strong>Tipo de planta:</strong> @(j.TryGetProperty("plant_type", out var plant) ? plant.GetString() : "-")</p>
+                    <p><strong>Comestible:</strong> @(j.TryGetProperty("edible", out var edible) && edible.ValueKind == JsonValueKind.True ? "Sí" : "No")</p>
+
+                    <h4>🌳 Disponibilidad</h4>
+                    @if (j.TryGetProperty("availability", out var avail) && avail.ValueKind == JsonValueKind.Array)
+                    {
+                        <ul>
+                        @foreach (var a in avail.EnumerateArray())
+                        {
+                            string from = a.TryGetProperty("from", out var f) ? f.GetString() ?? "" : "";
+                            string note = a.TryGetProperty("note", out var n) ? n.GetString() ?? "" : "";
+                            <li><strong>@from</strong> @(!string.IsNullOrWhiteSpace(note) ? $"({note})" : "")</li>
+                        }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>No se especifica disponibilidad.</p>
+                    }
+
+                    <h4>🖼️ Imagen</h4>
+                    @if (j.TryGetProperty("image_url", out var img))
+                    {
+                        <img src="@img.GetString()" alt="@Model.Name" class="img-thumbnail" width="160" />
+                    }
+                }
+                break;
+
+
+                // 🪑 FURNITURE / ITEMS / CLOTHING / TOOLS
+                case "clothing":
+{
+    <h4>🧥 Información general</h4>
+    <p><strong>Nombre:</strong> @(j.TryGetProperty("name", out var name) && name.ValueKind == JsonValueKind.String ? name.GetString() : "-")</p>
+    <p><strong>Categoría:</strong> @(j.TryGetProperty("category", out var cat) && cat.ValueKind == JsonValueKind.String ? cat.GetString() : "-")</p>
+    <p><strong>Estacionalidad:</strong> @(j.TryGetProperty("seasonality", out var season) && season.ValueKind == JsonValueKind.String ? season.GetString() : "Todo el año")</p>
+    <p><strong>Versión añadida:</strong> @(j.TryGetProperty("version_added", out var ver) && ver.ValueKind == JsonValueKind.String ? ver.GetString() : "-")</p>
+
+    @if (j.TryGetProperty("vill_equip", out var villEquip) && villEquip.ValueKind == JsonValueKind.True)
+    {
+        <p><strong>Usable por aldeanos:</strong> ✅ Sí</p>
+    }
+
+    <h4>💰 Economía</h4>
+    <p><strong>Precio de venta:</strong> @(j.TryGetProperty("sell", out var sell) ? SafeGetInt(sell) : 0) Bells</p>
+    <p><strong>Precio de compra:</strong>
+        @{
+            if (j.TryGetProperty("buy", out var buy) && buy.ValueKind == JsonValueKind.Array && buy.GetArrayLength() > 0)
+            {
+                var buyValues = new List<string>();
+                foreach (var item in buy.EnumerateArray())
+                {
+                    if (item.ValueKind == JsonValueKind.String)
+                    {
+                        buyValues.Add(item.GetString() ?? "");
+                    }
+                    else if (item.ValueKind == JsonValueKind.Number)
+                    {
+                        buyValues.Add(item.GetInt32().ToString());
+                    }
+                }
+                <text>@string.Join(", ", buyValues)</text>
+            }
+            else
+            {
+                <text>No disponible</text>
+            }
+        }
+    </p>
+
+    @if (j.TryGetProperty("styles", out var styles) && styles.ValueKind == JsonValueKind.Array)
+    {
+        <h4>🎨 Estilos</h4>
+        <ul>
+            @foreach (var s in styles.EnumerateArray())
+            {
+                if (s.ValueKind == JsonValueKind.String)
+                {
+                    <li>@s.GetString()</li>
+                }
+            }
+        </ul>
+    }
+
+    @if (j.TryGetProperty("label_themes", out var themes) && themes.ValueKind == JsonValueKind.Array)
+    {
+        <h4>🌈 Temas</h4>
+        <ul>
+            @foreach (var t in themes.EnumerateArray())
+            {
+                if (t.ValueKind == JsonValueKind.String)
+                {
+                    <li>@t.GetString()</li>
+                }
+            }
+        </ul>
+    }
+
+    @if (j.TryGetProperty("availability", out var availability) && availability.ValueKind == JsonValueKind.Array)
+    {
+        <h4>📦 Cómo se obtiene</h4>
+        <ul>
+            @foreach (var a in availability.EnumerateArray())
+            {
+                string from = "";
+                string note = "";
+                
+                if (a.TryGetProperty("from", out var f) && f.ValueKind == JsonValueKind.String)
+                {
+                    from = f.GetString() ?? "";
+                }
+                
+                if (a.TryGetProperty("note", out var n) && n.ValueKind == JsonValueKind.String)
+                {
+                    note = n.GetString() ?? "";
+                }
+                
+                <li><strong>@from</strong> @(!string.IsNullOrWhiteSpace(note) ? $"({note})" : "")</li>
+            }
+        </ul>
+    }
+
+    <!-- Aquí va la sección de variaciones corregida que puse arriba -->
+    @if (j.TryGetProperty("variations", out var variations) && variations.ValueKind == JsonValueKind.Array)
+{
+    <h4>👒 Variaciones</h4>
+    <div class="d-flex flex-wrap gap-3 mt-2">
+        @foreach (var v in variations.EnumerateArray())
+        {
+            string img = "";
+            string varName = "";
+
+            // ✅ Manejo seguro de image_url
+            if (v.TryGetProperty("image_url", out var vi) && vi.ValueKind == JsonValueKind.String)
+            {
+                img = vi.GetString() ?? "";
+            }
+
+            // ✅ Manejo seguro de variation
+            if (v.TryGetProperty("variation", out var vn) && vn.ValueKind == JsonValueKind.String)
+            {
+                varName = vn.GetString() ?? "";
+            }
+
+            <div class="text-center border rounded p-2 bg-light" style="width:130px;">
+                @if (!string.IsNullOrEmpty(img))
+                {
+                    <img src="@img" alt="@varName" width="80" height="80" class="mb-1" />
+                }
+                <p class="small">@(!string.IsNullOrEmpty(varName) ? varName : "Predeterminado")</p>
+            </div>
+        }
+    </div>
+}
+
+<h4>🖼️ Imagen principal</h4>
+@if (j.TryGetProperty("variations", out var varImg) && varImg.ValueKind == JsonValueKind.Array && varImg.GetArrayLength() > 0)
+{
+    var first = varImg[0];
+    if (first.TryGetProperty("image_url", out var img) && img.ValueKind == JsonValueKind.String)
+    {
+        <img src="@img.GetString()" alt="@Model.Name" class="img-thumbnail mt-2" width="160" />
+    }
+}
+}
+break;
+
+                case "furniture":
+                case "tools":
+                    <div>
+                        <h4>💰 Valores</h4>
+                        <p><strong>Precio de venta:</strong> @(j.TryGetProperty("Sell", out var sellItem) ? SafeGetInt(sellItem) : 0) Bells</p>
+                        <p><strong>Apilable:</strong> @(j.TryGetProperty("Stack", out var stack) ? SafeGetInt(stack) : 0)</p>
+                        <p><strong>Material:</strong> @(j.TryGetProperty("Material_Type", out var mat) ? mat.GetString() : "-")</p>
+                        <p><strong>Versión:</strong> @(j.TryGetProperty("Version_Added", out var verItem) ? verItem.GetString() : "-")</p>
+                    </div>
+                    break;
+
+                // 👩‍🌾 VILLAGERS
+                case "villagers":
+                {
+                    <h4>🏠 Información general</h4>
+                    <p><strong>Especie:</strong> @(j.TryGetProperty("species", out var species) ? species.GetString() : "-")</p>
+                    <p><strong>Personalidad:</strong> @(j.TryGetProperty("personality", out var pers) ? pers.GetString() : "-")</p>
+                    <p><strong>Género:</strong> @(j.TryGetProperty("gender", out var gen) ? gen.GetString() : "-")</p>
+                    <p><strong>Frase característica:</strong> @(j.TryGetProperty("phrase", out var phrase) ? phrase.GetString() : "-")</p>
+
+                    <h4>🎂 Cumpleaños</h4>
+                    <p><strong>Mes:</strong> @(j.TryGetProperty("birthday_month", out var bMonth) ? bMonth.GetString() : "-")</p>
+                    <p><strong>Día:</strong> @(j.TryGetProperty("birthday_day", out var bDay) ? bDay.GetString() : "-")</p>
+                    <p><strong>Signo zodiacal:</strong> @(j.TryGetProperty("sign", out var sign) ? sign.GetString() : "-")</p>
+
+                    <h4>👕 Apariencia</h4>
+                    <p><strong>Ropa inicial:</strong> @(j.TryGetProperty("clothing", out var cloth) ? cloth.GetString() : "-")</p>
+
+                    <h4>💬 Cita</h4>
+                    <blockquote class="border-start border-3 border-primary ps-3 fst-italic">
+                        @(j.TryGetProperty("quote", out var quote) ? quote.GetString() : "-")
+                    </blockquote>
+
+                    <h4>🎮 Apariciones</h4>
+                    {
+                        if (j.TryGetProperty("appearances", out var apps) && apps.ValueKind == JsonValueKind.Array)
+                        {
+                            <ul>
+                                @foreach (var app in apps.EnumerateArray())
+                                {
+                                    <li>@app.GetString()</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p>-</p>
+                        }
+                    }
+                }
+                break;
+
+
+                // 🧩 DEFAULT → mostrar el JSON crudo si no hay template
+                default:
+                    <pre class="bg-white p-3 border rounded">
+                        @JsonSerializer.Serialize(j, new JsonSerializerOptions { WriteIndented = true })
+                    </pre>
+                    break;
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-muted">Sin datos detallados guardados.</p>
+    }
+
+    <div class="mt-3">
+        <a asp-action="Index" class="btn btn-secondary">Volver</a>
+    </div>
+</div>
