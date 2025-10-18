@@ -6,13 +6,24 @@ using AnimalCrossingTracker.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 🔹 Conexión a la base de datos MySQL (cPanel)
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+// API Key
+var apiKey = Environment.GetEnvironmentVariable("NOOKIPEDIA_APIKEY");
+builder.Services.Configure<NookipediaOptions>(options =>
+{
+    options.ApiKey = apiKey;
+});
+
+// DB Connection
+var host = Environment.GetEnvironmentVariable("DB_HOST");
+var user = Environment.GetEnvironmentVariable("DB_USER");
+var pass = Environment.GetEnvironmentVariable("DB_PASS");
+var db   = Environment.GetEnvironmentVariable("DB_NAME");
+
+var connectionString = $"server={host};port=3306;database={db};user={user};password={pass};SslMode=None;AllowPublicKeyRetrieval=True;";
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
-           .EnableSensitiveDataLogging()        // opcional: útil para debug
-);
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
 
 // 🔹 Identity
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
