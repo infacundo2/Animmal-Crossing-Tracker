@@ -1,0 +1,70 @@
+body {
+    background: linear-gradient(180deg, #b3e5fc 0%, #81d4fa 100%);
+    font-family: 'Comic Sans MS', 'Poppins', sans-serif;
+}
+
+.login-container {
+    max-width: 420px;
+    margin: 5rem auto;
+    padding: 2rem 2.5rem;
+    background-color: #ffffffcc;
+    border-radius: 25px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.login-container h2 {
+    color: #00796b;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.form-floating {
+    margin-bottom: 1rem;
+}
+
+.form-floating input {
+    border-radius: 15px;
+    border: 2px solid #81d4fa;
+    padding: 0.8rem;
+    text-align: left;
+}
+
+.form-floating label {
+    color: #0288d1;
+}
+
+.btn-login {
+    background-color: #26c6da;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 15px;
+    padding: 0.7rem 1.2rem;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.btn-login:hover {
+    background-color: #00acc1;
+}
+
+.extra-links {
+    margin-top: 1rem;
+}
+
+.extra-links a {
+    color: #00796b;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.extra-links a:hover {
+    text-decoration: underline;
+}
+
+/* Centrar y alinear correctamente placeholders */
+input::placeholder {
+    text-align: left !important;
+    color: #90a4ae;
+}
