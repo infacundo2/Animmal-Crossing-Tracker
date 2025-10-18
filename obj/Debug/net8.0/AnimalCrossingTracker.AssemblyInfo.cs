@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AnimalCrossingTracker")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9357fbe6859b340a0b6a1496954b5afbaec76cf2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f8bd4060d5b61c90b0a349f2edb61d697918fb8b")]
 [assembly: System.Reflection.AssemblyProductAttribute("AnimalCrossingTracker")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AnimalCrossingTracker")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
