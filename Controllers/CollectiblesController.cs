@@ -93,7 +93,9 @@ namespace AnimalCrossingTracker.Controllers
 
             // 🔹 Filtro por categoría
             if (!string.IsNullOrEmpty(category))
-                query = query.Where(c => c.Category == category);
+                query = query.Where(c => c.Category == category)
+                            .OrderByDescending(c => c.Name); // 👈 orden Z → A solo en categoría
+
 
             // 🔹 Filtro por texto (nombre o descripción)
             if (!string.IsNullOrEmpty(search))
