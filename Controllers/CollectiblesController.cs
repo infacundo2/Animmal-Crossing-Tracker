@@ -36,37 +36,49 @@ namespace AnimalCrossingTracker.Controllers
 
         
          private string GetImageUrl(Collectible c)
-    {
-        if (string.IsNullOrEmpty(c.JsonData))
-            return "/images/default-placeholder.png";
-
-        try
         {
-            var root = JsonNode.Parse(c.JsonData);
+            if (string.IsNullOrEmpty(c.JsonData))
+                return "/images/default-placeholder.png";
 
-            // 1️⃣ Intentar image_url directo
-            var directUrl = root?["image_url"]?.ToString();
-            if (!string.IsNullOrEmpty(directUrl))
-                return directUrl;
-
-            // 2️⃣ Intentar primera variación
-            var variations = root?["variations"]?.AsArray();
-            if (variations != null && variations.Count > 0)
+            try
             {
-                var firstVar = variations[0];
-                var varImage = firstVar?["image_url"]?.ToString();
-                if (!string.IsNullOrEmpty(varImage))
-                    return varImage;
-            }
+                var root = JsonNode.Parse(c.JsonData);
 
-            // 3️⃣ Ninguna encontrada → imagen por defecto
-            return "/images/default-placeholder.png";
+                JsonObject? obj = null;
+
+                // Si el JSON es un array, toma el primer elemento
+                if (root is JsonArray arr && arr.Count > 0)
+                    obj = arr[0]?.AsObject();
+                else if (root is JsonObject o)
+                    obj = o;
+
+                if (obj == null)
+                    return "/images/default-placeholder.png";
+
+                // 1️⃣ Intentar image_url directo
+                var directUrl = obj["image_url"]?.ToString();
+                if (!string.IsNullOrEmpty(directUrl))
+                    return directUrl;
+
+                // 2️⃣ Intentar variaciones
+                var variations = obj["variations"]?.AsArray();
+                if (variations != null && variations.Count > 0)
+                {
+                    var firstVar = variations[0];
+                    var varImage = firstVar?["image_url"]?.ToString();
+                    if (!string.IsNullOrEmpty(varImage))
+                        return varImage;
+                }
+
+                // 3️⃣ Nada encontrado
+                return "/images/default-placeholder.png";
+            }
+            catch
+            {
+                return "/images/default-placeholder.png";
+            }
         }
-        catch
-        {
-            return "/images/default-placeholder.png";
-        }
-    }
+
 
         
         // GET: /Collectibles?category=fish&search=salmon&month=12&page=1
