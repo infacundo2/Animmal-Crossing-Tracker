@@ -9,6 +9,10 @@
       "PackagePath": "staticwebassets\\css\\acnh-auth.css"
     },
     {
+      "Id": "C:\\Users\\Wagner\\Documents\\Prueba ACNH\\AnimalCrossingTracker\\Animmal-Crossing-Tracker\\wwwroot\\css\\acnh-manage-nav.css",
+      "PackagePath": "staticwebassets\\css\\acnh-manage-nav.css"
+    },
+    {
       "Id": "C:\\Users\\Wagner\\Documents\\Prueba ACNH\\AnimalCrossingTracker\\Animmal-Crossing-Tracker\\wwwroot\\css\\acnh-profile.css",
       "PackagePath": "staticwebassets\\css\\acnh-profile.css"
     },

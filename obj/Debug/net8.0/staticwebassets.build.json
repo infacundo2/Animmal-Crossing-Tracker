@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "htwyHvxP9K4CWptPG461eAdKSD7+wEvBLuiAwzZYoz0=",
+  "Hash": "eqWkE0ngQ37uDSK1+al7sgpPR0eJdnm7jwsW73Z5d7Q=",
   "Source": "AnimalCrossingTracker",
   "BasePath": "_content/AnimalCrossingTracker",
   "Mode": "Default",
@@ -1212,6 +1212,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\acnh-auth.css"
+    },
+    {
+      "Identity": "C:\\Users\\Wagner\\Documents\\Prueba ACNH\\AnimalCrossingTracker\\Animmal-Crossing-Tracker\\wwwroot\\css\\acnh-manage-nav.css",
+      "SourceId": "AnimalCrossingTracker",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Wagner\\Documents\\Prueba ACNH\\AnimalCrossingTracker\\Animmal-Crossing-Tracker\\wwwroot\\",
+      "BasePath": "_content/AnimalCrossingTracker",
+      "RelativePath": "css/acnh-manage-nav.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\acnh-manage-nav.css"
     },
     {
       "Identity": "C:\\Users\\Wagner\\Documents\\Prueba ACNH\\AnimalCrossingTracker\\Animmal-Crossing-Tracker\\wwwroot\\css\\acnh-profile.css",

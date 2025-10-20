@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using AnimalCrossingTracker.Data;
 using AnimalCrossingTracker.Models;
 using AnimalCrossingTracker.Services;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,7 +46,10 @@ builder.Services.AddHttpClient<NookipediaService>(client =>
 });
 // 🔹 Configuración de la aplicación
 
-
+var keyPath = "/var/data/protection-keys"; // ruta persistente de Render
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(keyPath))
+    .SetApplicationName("AnimalCrossingTracker");
 
 var app = builder.Build();
 
