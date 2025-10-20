@@ -81,6 +81,36 @@ body {
     margin-top: 10px;
 }
 
+.manage-container {
+    background: #f3fff6;
+    border-radius: 20px;
+    padding: 25px;
+    max-width: 700px;
+    margin: 40px auto;
+    box-shadow: 0 4px 10px rgba(120,180,120,0.2);
+}
+
+.manage-container h3 {
+    color: #36896b;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.manage-container .btn {
+    background-color: #53b48b;
+    border-radius: 12px;
+    border: none;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.manage-container .btn:hover {
+    background-color: #449b76;
+    transform: translateY(-2px);
+}
+
+
 /* === Responsive === */
 @media (max-width: 600px) {
     .acnh-profile-container {
@@ -93,3 +123,4 @@ body {
         height: 100px;
     }
 }
+

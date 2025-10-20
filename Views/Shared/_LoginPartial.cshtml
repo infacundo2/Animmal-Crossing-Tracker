@@ -3,17 +3,28 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
-<ul class="navbar-nav">
+<ul class="navbar-nav align-items-center">
 @if (SignInManager.IsSignedIn(User))
 {
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index">Hola, @UserManager.GetUserName(User)!</a>
+    var currentUser = await UserManager.GetUserAsync(User);
+    var profileImage = currentUser?.ProfileImageUrl ?? "/images/default-avatar.png";
+
+    <li class="nav-item me-2">
+        <img src="@profileImage" alt="Avatar" 
+             class="rounded-circle border border-2 border-success"
+             style="width:35px; height:35px; object-fit:cover;" />
     </li>
+
+    <li class="nav-item">
+        <a class="nav-link text-dark fw-bold" asp-area="Identity" asp-page="/Account/Manage/Index">
+            Hola, @UserManager.GetUserName(User)!
+        </a>
+    </li>
+
     <li class="nav-item">
         <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" method="post" id="logoutForm">
             <button type="submit" class="nav-link btn btn-link text-dark border-0">Cerrar sesión</button>
         </form>
-
     </li>
 }
 else
