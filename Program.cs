@@ -13,6 +13,7 @@ builder.Services.Configure<NookipediaOptions>(options =>
     options.ApiKey = apiKey;
 });
 
+
 // DB Connection
 var host = Environment.GetEnvironmentVariable("DB_HOST");
 var user = Environment.GetEnvironmentVariable("DB_USER");

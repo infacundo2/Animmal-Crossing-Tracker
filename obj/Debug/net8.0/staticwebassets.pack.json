@@ -5,6 +5,14 @@
       "PackagePath": "staticwebassets\\AnimalCrossingTracker.bundle.scp.css"
     },
     {
+      "Id": "C:\\Users\\Wagner\\Documents\\Prueba ACNH\\AnimalCrossingTracker\\Animmal-Crossing-Tracker\\wwwroot\\css\\acnh-auth.css",
+      "PackagePath": "staticwebassets\\css\\acnh-auth.css"
+    },
+    {
+      "Id": "C:\\Users\\Wagner\\Documents\\Prueba ACNH\\AnimalCrossingTracker\\Animmal-Crossing-Tracker\\wwwroot\\css\\acnh-profile.css",
+      "PackagePath": "staticwebassets\\css\\acnh-profile.css"
+    },
+    {
       "Id": "C:\\Users\\Wagner\\Documents\\Prueba ACNH\\AnimalCrossingTracker\\Animmal-Crossing-Tracker\\wwwroot\\css\\collectibles.css",
       "PackagePath": "staticwebassets\\css\\collectibles.css"
     },

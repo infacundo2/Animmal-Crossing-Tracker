@@ -1,0 +1,95 @@
+/* === Animal Crossing Profile Page === */
+body {
+    background: linear-gradient(180deg, #b5f5d2 0%, #d8f7e3 100%);
+    font-family: "Comic Neue", "Poppins", sans-serif;
+    color: #2f4f4f;
+    min-height: 100vh;
+}
+
+.acnh-profile-container {
+    max-width: 480px;
+    background-color: #ffffffd9;
+    margin: 60px auto;
+    padding: 30px 35px;
+    border-radius: 25px;
+    box-shadow: 0 4px 10px rgba(80, 120, 80, 0.2);
+    text-align: center;
+    backdrop-filter: blur(4px);
+    border: 3px solid #a3e4c2;
+}
+
+.acnh-profile-container h2 {
+    color: #36896b;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    text-shadow: 1px 1px #ffffff;
+}
+
+.profile-pic-container {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.profile-pic {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    border: 5px solid #a3e4c2;
+    background-color: #d6f7e6;
+    object-fit: cover;
+    box-shadow: 0 3px 8px rgba(60, 100, 60, 0.3);
+}
+
+.form-floating label {
+    color: #4d806d;
+}
+
+.form-control {
+    border-radius: 12px;
+    border: 2px solid #a3e4c2;
+    padding: 12px;
+    transition: all 0.2s ease-in-out;
+    font-size: 1rem;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #53b48b;
+    box-shadow: 0 0 6px #89d9af;
+}
+
+.btn-acnh {
+    background-color: #53b48b;
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.1rem;
+    border-radius: 20px;
+    padding: 10px 25px;
+    cursor: pointer;
+    transition: transform 0.1s ease-in-out, background 0.3s;
+}
+
+.btn-acnh:hover {
+    background-color: #449b76;
+    transform: translateY(-2px);
+}
+
+.text-success {
+    color: #3e8d65 !important;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+/* === Responsive === */
+@media (max-width: 600px) {
+    .acnh-profile-container {
+        padding: 20px;
+        margin: 40px 15px;
+    }
+
+    .profile-pic {
+        width: 100px;
+        height: 100px;
+    }
+}

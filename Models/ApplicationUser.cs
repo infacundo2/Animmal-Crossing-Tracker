@@ -6,5 +6,6 @@ namespace AnimalCrossingTracker.Models
     {
         // Aquí podrías agregar campos personalizados más adelante
         // Ejemplo: public string IslandName { get; set; }
+        public string? ProfileImageUrl { get; set; }
     }
 }

@@ -1,0 +1,27 @@
+﻿@page
+@model AnimalCrossingTracker.Areas.Identity.Pages.Account.Manage.IndexModel
+@{
+    ViewData["Title"] = "Perfil";
+}
+
+<link rel="stylesheet" href="~/css/acnh-profile.css" />
+
+<div class="acnh-profile-container">
+    <h2>🌴 Mi Perfil</h2>
+
+    <form method="post">
+        <div class="profile-pic-container">
+            <img src="@Model.ProfileImageUrl" alt="Avatar" class="profile-pic" 
+                 onerror="this.src='/images/default-avatar.png';" />
+        </div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="ProfileImageUrl" class="form-control" placeholder="URL de imagen" />
+            <label asp-for="ProfileImageUrl">Imagen de perfil (URL)</label>
+        </div>
+
+        <button type="submit" class="btn-acnh">💾 Guardar cambios</button>
+    </form>
+
+    <p class="text-success mt-3">@Model.StatusMessage</p>
+</div>
