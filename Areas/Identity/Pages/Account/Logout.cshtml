@@ -3,8 +3,11 @@
 @{
     ViewData["Title"] = "Cerrar sesión";
 }
+<link rel="stylesheet" href="~/css/acnh-auth.css" />
 
-<div class="text-center mt-5">
-    <h3>Has cerrado sesión correctamente 🍃</h3>
-    <a asp-page="/Account/Login" class="btn btn-primary mt-3">Volver a iniciar sesión</a>
+<div class="auth-container">
+    <h2>🍎 ¡Hasta pronto, vecino!</h2>
+    <p class="subtitle">Has cerrado sesión exitosamente.</p>
+
+    <a asp-page="/Account/Login" class="btn btn-success mt-3">Volver a iniciar sesión 🌼</a>
 </div>

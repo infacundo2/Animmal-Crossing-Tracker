@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
+
+:root {
+  --acnh-green: #8fcf7b;
+  --acnh-sand: #fdf4e3;
+  --acnh-brown: #a87a52;
+  --acnh-blue: #a6dcef;
+  --acnh-pink: #ffcad4;
+}
+
+body {
+  background: var(--acnh-sand) url('/images/acnh-bg.png') repeat;
+  font-family: 'Quicksand', sans-serif;
+  color: #3b3b3b;
+}
+
+.auth-container {
+  max-width: 450px;
+  margin: 80px auto;
+  background: white;
+  border-radius: 25px;
+  padding: 40px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  text-align: center;
+  border: 3px solid var(--acnh-green);
+  animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-container h2 {
+  color: var(--acnh-brown);
+  margin-bottom: 10px;
+}
+
+.auth-container p.subtitle {
+  color: #6b705c;
+  margin-bottom: 25px;
+}
+
+.auth-container input {
+  border-radius: 15px;
+  border: 2px solid var(--acnh-green);
+  padding: 10px;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.auth-container button {
+  background: var(--acnh-green);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.auth-container button:hover {
+  background: #6dbb62;
+}
+
+.auth-container a {
+  color: var(--acnh-brown);
+  text-decoration: none;
+}
+
+.auth-container a:hover {
+  text-decoration: underline;
+}
