@@ -6,6 +6,7 @@ using AnimalCrossingTracker.Data;
 using AnimalCrossingTracker.Models;
 using AnimalCrossingTracker.Services;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using AnimalCrossingTracker.Models.ViewModels;
 
 namespace AnimalCrossingTracker.Controllers
@@ -33,6 +34,41 @@ namespace AnimalCrossingTracker.Controllers
             public Dictionary<string, string> Times_by_month_south { get; set; }
         }
 
+        
+         private string GetImageUrl(Collectible c)
+    {
+        if (string.IsNullOrEmpty(c.JsonData))
+            return "/images/default-placeholder.png";
+
+        try
+        {
+            var root = JsonNode.Parse(c.JsonData);
+
+            // 1️⃣ Intentar image_url directo
+            var directUrl = root?["image_url"]?.ToString();
+            if (!string.IsNullOrEmpty(directUrl))
+                return directUrl;
+
+            // 2️⃣ Intentar primera variación
+            var variations = root?["variations"]?.AsArray();
+            if (variations != null && variations.Count > 0)
+            {
+                var firstVar = variations[0];
+                var varImage = firstVar?["image_url"]?.ToString();
+                if (!string.IsNullOrEmpty(varImage))
+                    return varImage;
+            }
+
+            // 3️⃣ Ninguna encontrada → imagen por defecto
+            return "/images/default-placeholder.png";
+        }
+        catch
+        {
+            return "/images/default-placeholder.png";
+        }
+    }
+
+        
         // GET: /Collectibles?category=fish&search=salmon&month=12&page=1
         public async Task<IActionResult> Index(string? category, string? search, int? month, int page = 1)
         {
@@ -98,9 +134,14 @@ namespace AnimalCrossingTracker.Controllers
                 Name = c.Name,
                 Category = c.Category,
                 Description = c.Description,
-                ImageUrl = c.ImageUrl,
+                ImageUrl = GetImageUrl(c), // 👈 función auxiliar
                 HasItem = userItems.Contains(c.Id)
             }).ToList();
+
+            
+
+
+
 
             // 🔹 Enviar datos a la vista
             ViewBag.SelectedCategory = category;
@@ -110,6 +151,8 @@ namespace AnimalCrossingTracker.Controllers
             ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
             return View(model);
+
+
         }
 
 
